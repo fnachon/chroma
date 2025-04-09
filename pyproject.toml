@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chroma"
+version = "0.1.0"
+description = "Chroma is a generative model for designing proteins programmatically"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "Apache-2.0" }
+
+authors = [
+  { name = "Your Name or Organization" }
+]
+
+dependencies = [
+  "nglview==3.1.4",
+  "pandas==2.2.3",
+  "pillow==11.1.0",
+  "pytest==8.3.5",
+  "scipy==1.15.2",
+  "torch==2.6.0",
+  "tqdm==4.67.1",
+  "transformers==4.51.0",
+  "scikit-learn==1.6.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/generatebio/chroma"
+
+[tool.setuptools]
+packages = ["chroma"]
+
+[tool.setuptools.package-data]
+"chroma" = ["*.txt", "*.json"]
