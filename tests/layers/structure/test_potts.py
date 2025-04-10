@@ -117,6 +117,8 @@ def test_potts_mcmc(proposal, debug=False):
 
     if torch.cuda.is_available():
         device = "cuda"
+    if torch.backends.mps.is_available():
+        device = "mps"
         h = h.to(device)
         J = J.to(device)
         edge_idx = edge_idx.to(device)
