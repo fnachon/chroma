@@ -360,7 +360,10 @@ def average_transforms(
     R_avg = U @ Vh
 
     # Enforce that matrix is rotation matrix
-    d = torch.linalg.det(R_avg)
+    if torch.backends.mps.is_available():
+        d = torch.linalg.det(R_avg.cpu()).to("mps") # torch.linalg.det not implemented for mps, do on cpu
+    else:
+        d = torch.linalg.det(R_avg)
     d_expand = F.pad(d[..., None, None], (2, 0), value=1.0)
     Vh = Vh * d_expand
     R_avg = U @ Vh
