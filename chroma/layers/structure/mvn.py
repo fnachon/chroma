@@ -709,7 +709,11 @@ class ConditionalBackboneMVNGlobular(BackboneMVNGlobular):
         self.register_buffer("S22", RRt[self.nonzero_indices][:, self.nonzero_indices])
 
         S_clamp = self.S11 - ((self.S12 @ torch.linalg.pinv(self.S22) @ self.S21))
-        R_clamp = torch.linalg.cholesky(S_clamp)
+        if torch.backends.mps.is_available():
+            R_clamp = torch.linalg.cholesky(S_clamp.cpu()).to("mps") # cholesky unimplemented on mps, do on cpu 
+        else:
+            R_clamp = torch.linalg.cholesky(S_clamp)
+        
         self.register_buffer("RRt_clamp_restricted", R_clamp @ R_clamp.t())
         RRt_clamp = self._scatter(
             torch.zeros_like(RRt), self.zero_indices, self.RRt_clamp_restricted
