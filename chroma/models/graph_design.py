@@ -2274,7 +2274,7 @@ class ProteinTraversalSpatial(nn.Module):
 
 def load_model(
     weight_file: str,
-    device: str = "mps",
+    device: str = "cpu",
     strict: bool = False,
     strict_unexpected: bool = True,
     verbose: bool = True,
@@ -2285,7 +2285,7 @@ def load_model(
         weight_file (str): The destination path of the model weights to load.
             Compatible with files saved by `save_model`.
         device (str, optional): Pytorch device specification, e.g. `'cuda'` or `'mps'` for
-        GPU or `'cpu'` in the absence of GPU. Default is `'mps'`.
+        GPU or `'cpu'` in the absence of GPU. Default is `'cpu'`.
         strict (bool): Whether to require that the keys match between the
             input file weights and the model created from the parameters stored
             in the model kwargs.

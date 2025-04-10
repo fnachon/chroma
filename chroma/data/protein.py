@@ -36,11 +36,11 @@ class Protein:
 
     Attributes:
         sys (System): A protein system object used for various molecular operations.
-        device (str): Specifies the device on which tensors are managed. Defaults to `mps`.
+        device (str): Specifies the device on which tensors are managed. Defaults to `cpu`.
     """
 
     sys: System
-    device: str = "mps"
+    device: str = "cpu"
 
     def __new__(cls, *args, **kwargs):
         """Handles automatic loading of the protein based on the input.
@@ -117,7 +117,7 @@ class Protein:
             )
 
     @classmethod
-    def from_system(cls, system: System, device: str = "mps") -> Protein:
+    def from_system(cls, system: System, device: str = "cpu") -> Protein:
         protein = super(Protein, cls).__new__(cls)
         protein.sys = system
         protein.device = device
@@ -172,13 +172,13 @@ class Protein:
         return protein
 
     @classmethod
-    def from_PDB(cls, input_file: str, device: str = "mps") -> Protein:
+    def from_PDB(cls, input_file: str, device: str = "cpu") -> Protein:
         """
         Load a Protein object from a provided PDB file.
 
         Args:
             input_file (str): Path to the PDB file to be loaded.
-            device (str, optional): The device for tensor operations. Defaults to 'mps'.
+            device (str, optional): The device for tensor operations. Defaults to 'cpu'.
 
         Returns:
             Protein: Initialized Protein object from the provided PDB file.
@@ -190,14 +190,14 @@ class Protein:
 
     @classmethod
     def from_CIF(
-        cls, input_file: str, canonicalize: bool = True, device: str = "mps"
+        cls, input_file: str, canonicalize: bool = True, device: str = "cpu"
     ) -> Protein:
         """
         Load a Protein object from a provided CIF format.
 
         Args:
             input_file (str): Path to the CIF file to be loaded.
-            device (str, optional): The device for tensor operations. Defaults to 'mps'.
+            device (str, optional): The device for tensor operations. Defaults to 'cpu'.
 
         Returns:
             Protein: Initialized Protein object from the provided CIF file.
@@ -211,7 +211,7 @@ class Protein:
 
     @classmethod
     def from_PDBID(
-        cls, pdb_id: str, canonicalize: bool = True, device: str = "mps"
+        cls, pdb_id: str, canonicalize: bool = True, device: str = "cpu"
     ) -> Protein:
         """
         Load a Protein object using its PDBID by fetching the corresponding CIF file from the Protein Data Bank.
@@ -222,7 +222,7 @@ class Protein:
         Args:
             pdb_id (str): The PDBID of the protein to fetch.
             canonicalize (bool, optional): If set to True, the protein will be canonicalized post-loading. Defaults to True.
-            device (str, optional): The device for tensor operations. Defaults to 'mps'.
+            device (str, optional): The device for tensor operations. Defaults to 'cpu'.
 
         Returns:
             Protein: An instance of the Protein class initialized from the fetched CIF file corresponding to the PDBID.
@@ -239,14 +239,14 @@ class Protein:
 
     @classmethod
     def from_sequence(
-        cls, chains: Union[List[str], str], device: str = "mps"
+        cls, chains: Union[List[str], str], device: str = "cpu"
     ) -> Protein:
         """
         Load a protein object purely from Sequence with no structural content.
 
         Args:
             chains (Union[List[str],str]): a list of sequence strings, or a sequence string to create the protein.
-            device (str, optional): which device for torch outputs should be used. Defaults to "mps".
+            device (str, optional): which device for torch outputs should be used. Defaults to "cpu".
 
         Returns:
             Protein: An instance of the Protein class initialized a sequence or list of sequences.
