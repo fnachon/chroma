@@ -190,7 +190,11 @@ class CrossRMSD(nn.Module):
 
         # Compute optimal quaternion by extracting leading eigenvector
         if self.method == "symeig":
-            L, V = torch.linalg.eigh(F)
+            if torch.backends.mps.is_available(): # torch.linal.eigh not implemented for mps, do on cpu
+                L, V = torch.linalg.eigh(F.cpu())
+                L, V = L.to("mps"), V.to("mps")
+            else:
+                L, V = torch.linalg.eigh(F)
             top_eig = L[:, 3]
             vec = V[:, :, 3]
         elif self.method == "power":
