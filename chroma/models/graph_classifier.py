@@ -328,8 +328,8 @@ def load_model(
     Args:
         weight_file (str): The destination path of the model weights to load.
             Compatible with files saved by `save_model`.
-        device (str, optional): Pytorch device specification, e.g. `'cuda'` for
-        GPU. Default is `'cpu'`.
+        device (str, optional): Pytorch device specification, e.g. `'cuda'` or `'mps'` for
+        GPU or `'cpu' in the absence of GPU. `Default is `'cpu'`.
         strict (bool): Whether to require that the keys match between the
             input file weights and the model created from the parameters stored
             in the model kwargs.

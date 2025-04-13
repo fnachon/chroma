@@ -50,7 +50,7 @@ class Chroma(nn.Module):
             to use for the autoregressive design network.
 
         device (Optional[str]): The device on which to load the networks. If
-            not specified, will automatically use a CUDA device if available,
+            not specified, will automatically use a mps or CUDA device if available,
             otherwise CPU.
 
         strict (bool): Whether to strictly enforce that all keys in `weights`
@@ -76,10 +76,8 @@ class Chroma(nn.Module):
 
         # If no device is explicity specified automatically set device
         if device is None:
-            if torch.cuda.is_available():
-                device = "cuda"
-            else:
-                device = "cpu"
+            device = torch.device('mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu')
+
 
         self.backbone_network = graph_backbone.load_model(
             weights_backbone, device=device, strict=strict, verbose=verbose

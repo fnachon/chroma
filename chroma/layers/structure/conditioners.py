@@ -371,6 +371,8 @@ class ShapeConditioner(Conditioner):
         X_target = torch.Tensor(X_target).float().unsqueeze(0)
         if torch.cuda.is_available():
             X_target = X_target.to("cuda")
+        if torch.backends.mps.is_available():
+            X_target = X_target.to("mps")
 
         chain_ix = torch.arange(4 * num_residues, device=X_target.device) / 4.0
         distance_1D = (chain_ix[None, :, None] - chain_ix[None, None, :]).abs()
@@ -537,6 +539,8 @@ class ProCapConditioner(Conditioner):
         if device is None:
             if torch.cuda.is_available():
                 self.model.to("cuda")
+            if torch.backends.mps.is_available():
+                self.model.to("mps")
         else:
             self.model.to(device)
         self.caption = caption
@@ -614,7 +618,7 @@ class ProClassConditioner(Conditioner):
         renormalize_grad (bool, optional): Whether to renormalize gradient to have
             overall variance `weight`.
         use_sequence (bool, optional): Whether to use input sequence, default False.
-        device (str, optional): the device to put the conditioner on, accepts `cpu`
+        device (str, optional): the device to put the conditioner on, accepts `cpu`, 'mps'
             and `cuda`. If None is provided it will automatically try to put it on the
              GPU if possible. Defaults to None.
         debug (bool, optional): provides gradient values during optimization for
@@ -652,6 +656,8 @@ class ProClassConditioner(Conditioner):
         if device is None:
             if torch.cuda.is_available():
                 self.proclass_model.to("cuda")
+            if torch.backends.mps.is_available():
+                self.proclass_model.to("mps")
         else:
             self.proclass_model.to(device)
 

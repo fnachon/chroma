@@ -383,7 +383,7 @@ class Protein:
         explicit saving is still available with the respective export methods.
 
         Args:
-            device (str): The desired device for tensor operations, e.g., 'cpu' or 'cuda'.
+            device (str): The desired device for tensor operations, e.g., 'cpu' or 'cuda' or 'mps'.
         """
         if file_path.lower().endswith(".pdb"):
             self.to_PDB(file_path, force=force)

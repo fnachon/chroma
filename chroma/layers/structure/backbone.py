@@ -1052,12 +1052,20 @@ def impute_masked_X(X: torch.Tensor, C: torch.LongTensor) -> torch.Tensor:
     ix = torch.arange(C_atomic.shape[1], device=X.device).reshape([1, -1])
     mask_atomic_extend = mask_atomic.squeeze(-1)
     ix_mask = mask_atomic_extend * ix - (1 - mask_atomic_extend)
-    ix_left, _ = torch.cummax(ix_mask, dim=1)
+    if torch.backends.mps.is_available():
+        ix_left, _ = torch.cummax(ix_mask.cpu(), dim=1) # cummax not implemented on mps, do on cpu
+        ix_left = ix_left.to("mps") # move back tensor to mps
+    else:
+        ix_left, _ = torch.cummax(ix_mask, dim=1)
     ix_flip = torch.flip(
         mask_atomic_extend * ix_mask + (1 - mask_atomic_extend) * C_atomic.shape[1],
         [1],
     )
-    ix_right, _ = torch.cummin(ix_flip, dim=1)
+    if torch.backends.mps.is_available():
+        ix_right, _ = torch.cummin(ix_flip.cpu(), dim=1)  # cummin not implemented on mps, do on cpu
+        ix_right = ix_right.to("mps") # move back tensor to mp
+    else:
+        ix_right, _ = torch.cummin(ix_flip, dim=1)
     ix_right = torch.flip(ix_right, [1])
 
     ix_left = ix_left.long()
