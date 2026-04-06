@@ -24,6 +24,13 @@ import chroma
 ROOT_DIR = os.path.dirname(os.path.dirname(chroma.__file__))
 
 
+def download_cache_path(base_url: str, weights_name: str) -> str:
+    """Return the local cache path for a named weight download."""
+    url_hash = hashlib.md5((base_url + weights_name).encode()).hexdigest()
+    temp_dir = os.path.join(tempfile.gettempdir(), "chroma_weights", url_hash)
+    return os.path.join(temp_dir, "weights.pt")
+
+
 def register_key(key: str, key_directory=ROOT_DIR) -> None:
     """
     Registers the provided key by saving it to a JSON file.
@@ -90,10 +97,8 @@ def download_from_generate(
         str: Path to the downloaded (or cached) file.
     """
 
-    # Create a hash of the URL + weight name to determine the path for the cached/temporary file
-    url_hash = hashlib.md5((base_url + weights_name).encode()).hexdigest()
-    temp_dir = os.path.join(tempfile.gettempdir(), "chroma_weights", url_hash)
-    destination = os.path.join(temp_dir, "weights.pt")
+    destination = download_cache_path(base_url, weights_name)
+    temp_dir = os.path.dirname(destination)
 
     # Ensure the directory exists
     os.makedirs(temp_dir, exist_ok=True)

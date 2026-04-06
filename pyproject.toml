@@ -4,33 +4,43 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chroma"
-version = "0.1.0"
+version = "1.0.0"
 description = "Chroma is a generative model for designing proteins programmatically"
 readme = "README.md"
 requires-python = ">=3.13"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 
 authors = [
-  { name = "Your Name or Organization" }
+  { name = "Generate Biomedicines, Inc." }
 ]
 
 dependencies = [
-  "nglview==3.1.4",
-  "pandas==2.2.3",
-  "pillow==11.1.0",
-  "pytest==8.3.5",
-  "scipy==1.15.2",
-  "torch==2.6.0",
+  "numpy==2.4.3",
+  "pillow==12.2.0",
+  "requests==2.33.1",
+  "scipy==1.17.1",
+  "torch==2.10.0",
   "tqdm==4.67.1",
-  "transformers==4.51.0",
-  "scikit-learn==1.6.1"
+  "transformers==5.5.0",
+  "scikit-learn==1.8.0"
+]
+
+[project.optional-dependencies]
+notebook = [
+  "nglview==3.1.4"
+]
+test = [
+  "build==1.3.0",
+  "pandas==2.3.3",
+  "pytest==9.0.2",
+  "twine==6.2.0"
 ]
 
 [project.urls]
 Homepage = "https://github.com/generatebio/chroma"
 
-[tool.setuptools]
-packages = ["chroma"]
+[tool.setuptools.packages.find]
+include = ["chroma*"]
 
 [tool.setuptools.package-data]
-"chroma" = ["*.txt", "*.json"]
+chroma = ["assets/centering/*.params"]

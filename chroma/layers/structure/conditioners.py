@@ -23,7 +23,6 @@ import torch.nn.functional as F
 from scipy.sparse.csgraph import shortest_path
 from torch import nn
 
-import chroma.utility.chroma
 from chroma.data.protein import Protein
 from chroma.data.xcs import validate_XC
 from chroma.layers.structure import backbone, mvn, optimal_transport, symmetry
@@ -333,7 +332,9 @@ class ShapeConditioner(Conditioner):
             X_target = X_target.cpu().data.numpy()
 
         if self.autoscale:
-            X_target, self.shape_cutoff_D = chroma.utility.chroma.point_cloud_rescale(
+            from chroma.utility.chroma import point_cloud_rescale
+
+            X_target, self.shape_cutoff_D = point_cloud_rescale(
                 X_target,
                 self.autoscale_num_residues,
                 scale_ratio=self.autoscale_target_ratio,
@@ -647,7 +648,9 @@ class ProClassConditioner(Conditioner):
         self.debug = debug
 
         if isinstance(model, str):
-            self.proclass_model = graph_classifier.load_model(model, device=device)
+            self.proclass_model = graph_classifier.load_model(
+                model, device=device, strict_unexpected=False
+            )
         elif isinstance(model, GraphClassifier):
             self.proclass_model = model
         self.proclass_model.eval()
@@ -730,6 +733,8 @@ class ProClassConditioner(Conditioner):
         if level == "chain":
             node_h, c_mask = pool(node_h, C)
             c_mask = c_mask
+        elif level == "complex":
+            node_h, c_mask = pool(node_h, C)
         elif level == "first_order":
             c_mask = C > 0
         elif level == "second_order":
@@ -737,6 +742,8 @@ class ProClassConditioner(Conditioner):
         node_h = head(node_h)
 
         if mask is not None:
+            if level == "complex" and mask.dim() > c_mask.dim():
+                mask = mask.squeeze(-1)
             c_mask = mask & c_mask
 
         if self.proclass_model.class_config[label]["loss"] == "ce":
@@ -744,7 +751,7 @@ class ProClassConditioner(Conditioner):
         else:
             neglogp = node_h.sigmoid().log().mul(-1)
 
-        if level == "chain":
+        if level in ["chain", "complex"]:
             index = (
                 self.proclass_model.class_config[label]["tokenizer"][value]
                 if value is not None
