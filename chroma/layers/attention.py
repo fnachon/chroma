@@ -28,11 +28,14 @@ def _scaled_attention(q, k, v, mask=None, bias=None):
     logits = torch.einsum("bqhc,bkhc->bhqk", q, k) / q.size(-1) ** 0.5
     if bias is not None:
         logits = logits + bias
-
-    weights = torch.nn.functional.softmax(logits, dim=-1)
+    # Fix #1: mask before softmax so masked keys don't inflate the denominator
+    # and the output remains a true convex combination of valid values.
+    # nan_to_num(0.0) guards all-masked query rows (e.g. ghost chains in batches
+    # with heterogeneous chain counts) which would otherwise produce NaN.
     if mask is not None:
-        weights = weights.masked_fill(~mask, 0.0)
-
+        logits = logits.masked_fill(~mask, float("-inf"))
+    weights = torch.nn.functional.softmax(logits, dim=-1)
+    weights = weights.nan_to_num(0.0)
     output = torch.einsum("bhqk,bkhc->bqhc", weights, v)
     return output, weights
 
@@ -111,7 +114,6 @@ class MultiHeadAttention(nn.Module):
         self.Wk = nn.Parameter(torch.Tensor(n_head, d_model, d_k))
         self.Wv = nn.Parameter(torch.Tensor(n_head, d_model, d_v))
         self.Wo = nn.Parameter(torch.Tensor(n_head * d_v, d_model))
-        self.attention = ScaledDotProductAttention()
         self.dropout = nn.Dropout(p=dropout)
         self.reset_parameters()
 

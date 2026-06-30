@@ -1,10 +1,11 @@
 import torch
 
-from chroma.layers.attention import AttentionChainPool, MultiHeadAttention
+from chroma.layers.attention import AttentionChainPool, MultiHeadAttention, ScaledDotProductAttention
 
 
 def _legacy_multi_head_attention(module, Q, K, V, mask=None):
     mb_size = Q.size(0)
+    sdp = ScaledDotProductAttention()
 
     q_s = torch.cat([Q @ W for W in module.Wq])
     k_s = torch.cat([K @ W for W in module.Wk])
@@ -13,7 +14,7 @@ def _legacy_multi_head_attention(module, Q, K, V, mask=None):
     if mask is not None:
         mask = mask.repeat(module.n_head, 1, 1)
 
-    outputs, attns = module.attention(q_s, k_s, v_s, mask=mask)
+    outputs, attns = sdp(q_s, k_s, v_s, mask=mask)
     outputs = torch.cat(torch.split(outputs, mb_size, dim=0), dim=-1)
     outputs = module.dropout(outputs @ module.Wo)
     return outputs, attns

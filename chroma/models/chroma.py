@@ -28,6 +28,7 @@ from chroma.constants import AA20_3
 from chroma.data.protein import Protein
 from chroma.layers.structure.backbone import ProteinBackbone
 from chroma.models import graph_backbone, graph_design
+from chroma.utility.torch import get_default_device
 
 
 class Chroma(nn.Module):
@@ -74,9 +75,9 @@ class Chroma(nn.Module):
 
         warnings.filterwarnings("ignore")
 
-        # If no device is explicity specified automatically set device
+        # If no device is explicitly specified automatically set device
         if device is None:
-            device = torch.device('mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu')
+            device = get_default_device()
 
 
         self.backbone_network = graph_backbone.load_model(
